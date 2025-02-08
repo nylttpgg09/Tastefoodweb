@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食探索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            background-image: url('背景x.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(247, 247, 247, 0.7); /* 增加透明度 */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+        }
+
+        .navbar {
+            background-color: #ff7f7f;
+            width: 100%;
+            padding: 20px 0;
+            color: white;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ff7f7f, #ff6b6b);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .search-container input {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: none;
+            width: 300px;
+        }
+
+        .search-container button {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background-color: white;
+            color: #ff7f7f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-container button:hover {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .content {
+            width: 80%;
+            max-width: 1200px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95); /* 增加透明度 */
+            border-radius: 15px; /* 增加圆角 */
+            box-shadow: 0 4px 20px rgba(255, 127, 127, 0.2); /* 添加粉色阴影 */
+        }
+
+        .food-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .food-item {
+            animation: fadeIn 0.5s ease;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px; /* 增加圆角 */
+            box-shadow: 0 4px 12px rgba(255, 127, 127, 0.15); /* 粉色阴影 */
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 127, 127, 0.1); /* 添加淡粉色边框 */
+        }
+
+        .food-item img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .food-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(255, 127, 127, 0.25); /* 加强hover效果 */
+        }
+
+        .food-item h3 {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .food-item p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters select, .filters input {
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .filters select:focus, .filters input:focus {
+            border-color: #ff7043;
+            box-shadow: 0 0 5px rgba(255, 112, 67, 0.3);
+        }
+
+        .recipe-steps {
+            display: none;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        /* 新增按钮样式 */
+        .food-item button {
+            background-color: #ff7f7f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px; /* 增加圆角 */
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(255, 127, 127, 0.2);
+        }
+
+        .food-item button:hover {
+            background-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 127, 127, 0.3);
+        }
+
+        /* 新增动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 新增加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .loading::after {
+            content: "";
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ff7043;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 新增展开效果样式 */
+        .food-item.expanded {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .food-item.expanded img {
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .food-item.expanded h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .food-item.expanded p {
+            font-size: 1rem;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .food-item.expanded .recipe-steps {
+            display: block;
+            background: #fff5f5;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .food-item.expanded .recipe-steps::before {
+            content: "制作步骤：";
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ff7f7f;
+        }
+
+        .food-item.expanded button {
+            margin-top: 20px;
+        }
+
+        .food-item.expanded .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff7f7f;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 新增评分样式 */
+        .rating-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .rating-stars .star {
+            cursor: pointer;
+            color: #ddd;
+            font-size: 24px;
+            transition: color 0.2s;
+        }
+
+        .rating-stars .star.active {
+            color: #ff7043;
+        }
+
+        .average-rating {
+            font-size: 14px;
+            color: #666;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="search-container">
+            <input type="text" id="global-search" placeholder="搜索美食..." />
+            <button onclick="window.location.href='界面1.html'">返回首页</button>
+        </div>
+        <span>美食探索</span>
+    </div>
+
+    <div class="content">
+        <div class="filters">
+            <select id="food-type">
+                <option value="chinese">中国菜系</option>
+                <option value="western">西餐</option>
+                <option value="japanese">日本料理</option>
+            </select>
+            <select id="region">
+                <option value="all">所有地区</option>
+                <option value="north">华北地区</option>
+                <option value="south">华南地区</option>
+                <option value="east">华东地区</option>
+                <option value="west">西北地区</option>
+                <option value="southwest">西南地区</option>
+                <option value="northeast">东北地区</option>
+            </select>
+            <input type="text" id="search-bar" placeholder="搜索美食..." />
+        </div>
+
+        <div class="food-list" id="food-list">
+        </div>
+    </div>
+
+    <script>
+        const chineseCuisines = [
+            '川菜', '鲁菜', '粤菜', '苏菜', '闽菜', '浙菜', '湘菜', '徽菜', '豫菜', '东北菜',
+            '新疆菜', '山西菜', '陕西菜', '江西菜', '广西菜', '海南菜'
+        ];
+
+        const foodData = {
+            chinese: [
+                { name: "宫保鸡丁", description: "经典川菜，辣味十足，鸡肉嫩滑。", imgUrl: "https://via.placeholder.com/300x200?text=宫保鸡丁", recipe: "1. 鸡胸肉切丁；2. 辣椒、花椒炒香；3. 加入鸡肉丁翻炒；4. 加入酱料炒均匀即可。" },
+                { name: "北京烤鸭", description: "北京的传统名菜，外脆内嫩，皮脆肉嫩。", imgUrl: "https://via.placeholder.com/300x200?text=北京烤鸭", recipe: "1. 烤鸭腌制；2. 高温烤制；3. 配上薄饼、甜面酱、葱段享用。" }
+            ],
+            western: [
+                { name: "意大利面", description: "经典的西餐，番茄酱味浓郁，口感丰富。", imgUrl: "https://via.placeholder.com/300x200?text=意大利面", recipe: "1. 煮意大利面；2. 加入番茄酱；3. 撒上芝士，搅拌均匀。" }
+            ],
+            japanese: [
+                { name: "寿司", description: "新鲜的鱼片配上香软的米饭，极致的美味。", imgUrl: "https://via.placeholder.com/300x200?text=寿司", recipe: "1. 准备寿司米；2. 鱼片切薄；3. 米饭与醋搅拌；4. 捏成寿司形状。" }
+            ]
+        };
+
+        const regionMapping = {
+            north: ['京菜', '冀菜', '晋菜'],
+            south: ['粤菜', '桂菜', '琼菜'],
+            east: ['苏菜', '浙菜', '闽菜', '沪菜'],
+            west: ['陕菜', '甘菜', '宁菜', '新疆菜'],
+            southwest: ['川菜', '黔菜', '滇菜', '藏菜'],
+            northeast: ['东北菜']
+        };
+
+        const foodTypeSelect = document.getElementById("food-type");
+        const regionSelect = document.getElementById("region");
+        const foodList = document.getElementById("food-list");
+        const searchBar = document.getElementById("search-bar");
+        const globalSearch = document.getElementById("global-search");
+
+        // 初始化加载状态
+        let isLoading = false;
+
+        // 新增评分数据存储
+        const ratings = {};
+
+        // 模拟加载效果
+        function showLoading() {
+            isLoading = true;
+            foodList.innerHTML = '<div class="loading"></div>';
+        }
+
+        // 生成美食列表
+        function generateFoodList(cuisineType, region = 'all') {
+            showLoading();
+            
+            setTimeout(() => {
+                foodList.innerHTML = '';
+                
+                let cuisines = cuisineType === 'chinese' ? chineseCuisines : foodData[cuisineType] || [];
+                
+                if (region !== 'all' && cuisineType === 'chinese') {
+                    cuisines = cuisines.filter(cuisine => 
+                        regionMapping[region]?.some(regionalCuisine => 
+                            cuisine.includes(regionalCuisine)
+                        )
+                    );
+                }
+
+                if (cuisineType === 'chinese') {
+                    cuisines.forEach(cuisine => {
+                        const foodItem = document.createElement('div');
+                        foodItem.classList.add('food-item');
+                        foodItem.innerHTML = `
+                            <h3>${cuisine}</h3>
+                            <p>这是一道经典的${cuisine}菜系。</p>
+                            <button onclick="toggleDetails(this)">查看详情</button>
+                            <div class="details-content" style="display: none;">
+                                <h4>${cuisine}简介</h4>
+                                <p>${cuisine}是中国传统菜系之一，以其独特的风味和烹饪技巧闻名。</p>
+                                <div class="recipe-steps">
+                                    1. 准备食材<br>
+                                    2. 传统烹饪方法<br>
+                                    3. 调味装盘
+                                </div>
+                                ${generateRatingHTML(cuisine)}
+                            </div>
+                        `;
+                        foodList.appendChild(foodItem);
+                    });
+                } else {
+                    cuisines.forEach(food => {
+                        const foodItem = document.createElement('div');
+                        foodItem.classList.add('food-item');
+                        foodItem.innerHTML = `
+                            <img src="${food.imgUrl}" alt="${food.name}" />
+                            <h3>${food.name}</h3>
+                            <p>${food.description}</p>
+                            <button onclick="toggleDetails(this)">查看详情</button>
+                            <div class="details-content" style="display: none;">
+                                <h4>${food.name}制作流程</h4>
+                                <div class="recipe-steps">${food.recipe}</div>
+                                ${generateRatingHTML(food.name)}
+                                <button class="close-btn" onclick="closeDetails(this)">×</button>
+                            </div>
+                        `;
+                        foodList.appendChild(foodItem);
+                    });
+                }
+            }, 500);
+        }
+
+        function toggleDetails(button) {
+            const foodItem = button.closest('.food-item');
+            const detailsContent = foodItem.querySelector('.details-content');
+            
+            // 关闭其他展开的项
+            document.querySelectorAll('.food-item.expanded').forEach(item => {
+                if (item !== foodItem) {
+                    item.classList.remove('expanded');
+                    item.querySelector('.details-content').style.display = 'none';
+                }
+            });
+
+            foodItem.classList.toggle('expanded');
+            detailsContent.style.display = foodItem.classList.contains('expanded') ? 'block' : 'none';
+        }
+
+        function closeDetails(button) {
+            const foodItem = button.closest('.food-item');
+            foodItem.classList.remove('expanded');
+            foodItem.querySelector('.details-content').style.display = 'none';
+        }
+
+        foodTypeSelect.addEventListener('change', (e) => {
+            generateFoodList(e.target.value, regionSelect.value);
+        });
+
+        regionSelect.addEventListener('change', (e) => {
+            generateFoodList(foodTypeSelect.value, e.target.value);
+        });
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.food-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        globalSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.food-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // 新增生成评分HTML的函数
+        function generateRatingHTML(foodName) {
+            const currentRating = ratings[foodName] || { average: 0, count: 0 };
+            return `
+                <div class="rating-container">
+                    <div class="rating-stars">
+                        ${[1, 2, 3, 4, 5].map(i => `
+                            <span class="star" data-value="${i}" onclick="rateFood('${foodName}', ${i})">
+                                ${i <= currentRating.average ? '★' : '☆'}
+                            </span>
+                        `).join('')}
+                    </div>
+                    <div class="average-rating">
+                        （${currentRating.average.toFixed(1)}分，${currentRating.count}人评分）
+                    </div>
+                </div>
+            `;
+        }
+
+        // 新增评分功能
+        function rateFood(foodName, rating) {
+            if (!ratings[foodName]) {
+                ratings[foodName] = { total: 0, count: 0, average: 0 };
+            }
+            
+            ratings[foodName].total += rating;
+            ratings[foodName].count++;
+            ratings[foodName].average = ratings[foodName].total / ratings[foodName].count;
+
+            // 保存评分到localStorage
+            localStorage.setItem('foodRatings', JSON.stringify(ratings));
+
+            // 更新评分显示
+            const ratingContainer = document.querySelector(`.food-item.expanded h3:contains("${foodName}")`)
+                ?.closest('.food-item')
+                ?.querySelector('.rating-container');
+            if (ratingContainer) {
+                ratingContainer.innerHTML = generateRatingHTML(foodName);
+            }
+        }
+
+        // 页面加载时读取评分数据
+        window.addEventListener('load', () => {
+            const savedRatings = localStorage.getItem('foodRatings');
+            if (savedRatings) {
+                Object.assign(ratings, JSON.parse(savedRatings));
+            }
+        });
+
+        generateFoodList('chinese', 'all');
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食点评</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: rgba(248, 248, 248, 0.95);
+            background-image: url('背景x.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .review-form {
+            display: grid;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-weight: 600;
+            color: #555;
+        }
+        select, textarea {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        select:focus, textarea:focus {
+            border-color: #ff6b6b;
+            outline: none;
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover {
+            background-color: #ff4757;
+        }
+        .food-info {
+            background: #fff5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .food-info h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .food-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .back-btn:hover {
+            background-color: #ff4757;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .back-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='界面1.html'">
+        ← 返回首页
+    </button>
+
+    <div class="container">
+        <h2>美食点评</h2>
+        
+        <!-- 美食信息展示 -->
+        <div class="food-info">
+            <h3 id="foodName">正在加载美食信息...</h3>
+            <p id="foodDescription"></p>
+        </div>
+
+        <!-- 点评表单 -->
+        <form class="review-form" id="reviewForm">
+            <input type="hidden" id="foodId">
+            
+            <div class="form-group">
+                <label for="rating">评分：</label>
+                <select id="rating" required>
+                    <option value="">请选择评分</option>
+                    <option value="1">⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="5">⭐⭐⭐⭐⭐</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comment">评论：</label>
+                <textarea id="comment" placeholder="请输入您的详细评价..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">提交点评</button>
+        </form>
+    </div>
+
+    <script>
+        // 模拟美食数据
+        const foodData = {
+            1: { name: "红烧肉", description: "经典家常菜，肥而不腻" },
+            2: { name: "宫保鸡丁", description: "川菜代表，酸甜适口" },
+            3: { name: "麻婆豆腐", description: "麻辣鲜香，口感嫩滑" }
+        };
+
+        // 获取URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const foodId = urlParams.get('foodId');
+
+        // 设置美食信息
+        const foodInfo = foodData[foodId] || { name: "未知美食", description: "暂无描述" };
+        document.getElementById('foodName').textContent = foodInfo.name;
+        document.getElementById('foodDescription').textContent = foodInfo.description;
+        document.getElementById('foodId').value = foodId;
+
+        // 处理表单提交
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reviewData = {
+                foodId: foodId,
+                foodName: foodInfo.name,
+                rating: document.getElementById('rating').value,
+                comment: document.getElementById('comment').value,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // 保存点评数据到localStorage
+            saveReview(reviewData);
+            
+            alert('点评提交成功！');
+            window.location.href = '界面2.html';
+        });
+
+        function saveReview(review) {
+            let reviews = JSON.parse(localStorage.getItem('foodReviews') || '[]');
+            reviews.push(review);
+            localStorage.setItem('foodReviews', JSON.stringify(reviews));
+        }
+    </script>
+</body>
+</html>
